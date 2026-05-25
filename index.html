@@ -1,0 +1,1153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CRO Generate</title>
+<link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@300;400;500&family=Geist:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f5f4f0;
+    --surface: #ffffff;
+    --border: #d8d6d0;
+    --border2: #e8e6e0;
+    --text: #1a1a18;
+    --muted: #888880;
+    --accent: #2563eb;
+    --accent-bg: #eff6ff;
+    --green: #16a34a;
+    --red: #dc2626;
+    --font: 'Geist', sans-serif;
+    --mono: 'Geist Mono', monospace;
+  }
+
+  body.dark {
+    --bg: #111110;
+    --surface: #1c1c1a;
+    --border: #2e2e2b;
+    --border2: #252523;
+    --text: #e8e6e0;
+    --muted: #666660;
+    --accent: #3b82f6;
+    --accent-bg: #1e2a3e;
+  }
+
+  .theme-toggle {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    padding: 2px;
+  }
+
+  .theme-btn {
+    background: none;
+    border: none;
+    border-radius: 5px;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: var(--muted);
+    transition: background 0.15s, color 0.15s;
+    flex-shrink: 0;
+  }
+
+  .theme-btn:hover { color: var(--text); }
+
+  .theme-btn svg {
+    width: 15px; height: 15px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.75;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .theme-btn-sun.active {
+    background: var(--surface);
+    color: var(--text);
+  }
+
+  .theme-btn-moon.active {
+    background: var(--surface);
+    color: var(--text);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font);
+    font-size: 14px;
+    min-height: 100vh;
+    transition: background 0.2s, color 0.2s;
+  }
+
+  header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 0 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 52px;
+  }
+
+  .logo-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .logo {
+    font-family: var(--mono);
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--text);
+    letter-spacing: -0.03em;
+  }
+
+  .logo span {
+    color: var(--accent);
+  }
+
+  nav {
+    display: flex;
+    gap: 2px;
+  }
+
+  nav button {
+    background: none;
+    border: none;
+    color: var(--muted);
+    font-family: var(--font);
+    font-size: 13px;
+    font-weight: 500;
+    padding: 5px 12px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.1s, color 0.1s;
+  }
+
+  nav button:hover {
+    background: var(--bg);
+    color: var(--text);
+  }
+
+  nav button.active {
+    background: var(--bg);
+    color: var(--text);
+  }
+
+  main {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 32px 20px;
+  }
+
+  .hero {
+    margin-bottom: 28px;
+  }
+
+  .hero h1 {
+    font-size: 22px;
+    font-weight: 600;
+    letter-spacing: -0.03em;
+    margin-bottom: 5px;
+  }
+
+  .hero p {
+    color: var(--muted);
+    font-size: 13px;
+    line-height: 1.55;
+    max-width: 520px;
+  }
+
+  .panels { display: none; flex-direction: column; gap: 12px; }
+  .panels.active { display: flex; }
+
+  .panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+  }
+
+  .panel-header {
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--border2);
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+  }
+
+  .panel-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  .panel-desc {
+    font-size: 12px;
+    color: var(--muted);
+  }
+
+  .panel-body {
+    padding: 18px;
+  }
+
+  .field-row {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 12px;
+  }
+
+  .field {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    flex: 1;
+    min-width: 110px;
+  }
+
+  label {
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  input[type="number"],
+  input[type="text"],
+  select,
+  textarea {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    color: var(--text);
+    font-family: var(--mono);
+    font-size: 13px;
+    padding: 6px 10px;
+    width: 100%;
+    outline: none;
+    transition: border-color 0.12s;
+    -webkit-appearance: none;
+  }
+
+  input:focus, select:focus, textarea:focus {
+    border-color: var(--accent);
+    background: #fff;
+  }
+
+  select { cursor: pointer; }
+
+  textarea {
+    resize: vertical;
+    min-height: 88px;
+    font-size: 12px;
+  }
+
+  .checkbox-row {
+    display: flex;
+    gap: 14px;
+    flex-wrap: wrap;
+    margin-bottom: 12px;
+  }
+
+  .checkbox-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    font-size: 13px;
+    color: var(--text);
+    user-select: none;
+  }
+
+  .checkbox-item input[type="checkbox"] {
+    width: 14px; height: 14px;
+    accent-color: var(--accent);
+    cursor: pointer;
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 6px 14px;
+    border-radius: 5px;
+    border: 1px solid transparent;
+    font-family: var(--font);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.1s, border-color 0.1s;
+  }
+
+  .btn-primary {
+    background: var(--accent);
+    color: #fff;
+    border-color: var(--accent);
+  }
+
+  .btn-primary:hover { background: #1d4ed8; border-color: #1d4ed8; }
+  .btn-primary:active { background: #1e40af; }
+
+  .btn-secondary {
+    background: var(--surface);
+    color: var(--muted);
+    border-color: var(--border);
+  }
+
+  .btn-secondary:hover { color: var(--text); border-color: #aaa; }
+
+  .btn-sm { padding: 4px 10px; font-size: 12px; }
+
+  .btn-row {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  .output-box {
+    margin-top: 14px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    overflow: hidden;
+    display: none;
+    background: var(--surface);
+  }
+
+  .output-box.show { display: block; }
+
+  .output-topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 6px 12px;
+    border-bottom: 1px solid var(--border2);
+    background: var(--bg);
+  }
+
+  .output-label {
+    font-size: 11px;
+    color: var(--muted);
+    font-family: var(--mono);
+    font-weight: 400;
+  }
+
+  .output-content {
+    padding: 12px 14px;
+    font-family: var(--mono);
+    font-size: 13px;
+    line-height: 1.75;
+    color: var(--text);
+    word-break: break-all;
+    max-height: 260px;
+    overflow-y: auto;
+    white-space: pre-wrap;
+  }
+
+  .output-content .big-num {
+    font-size: 2.8rem;
+    font-weight: 500;
+    display: block;
+    text-align: center;
+    padding: 8px 0;
+    color: var(--accent);
+    letter-spacing: -0.04em;
+  }
+
+  .stats-row {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-top: 10px;
+  }
+
+  .stat-chip {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 3px 8px;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--muted);
+  }
+
+  .stat-chip span { color: var(--text); }
+
+  .dice-grid {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-bottom: 12px;
+  }
+
+  .die-btn {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    color: var(--text);
+    font-family: var(--mono);
+    font-size: 12px;
+    padding: 5px 12px;
+    cursor: pointer;
+    transition: all 0.1s;
+    font-weight: 400;
+  }
+
+  .die-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .die-btn.selected { border-color: var(--accent); color: var(--accent); background: var(--accent-bg); }
+
+  ::-webkit-scrollbar { width: 5px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+  .history-list {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    max-height: 200px;
+    overflow-y: auto;
+  }
+
+  .history-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border: 1px solid var(--border2);
+    border-radius: 5px;
+    padding: 5px 10px;
+    font-family: var(--mono);
+    font-size: 11px;
+    background: var(--bg);
+  }
+
+  .history-type { color: var(--muted); flex-shrink: 0; min-width: 80px; }
+  .history-val { color: var(--text); flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .history-time { color: var(--muted); font-size: 10px; flex-shrink: 0; }
+
+  @keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+
+  .spinning { animation: spin 0.6s linear infinite; display: inline-block; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo-group">
+    <div class="logo">CRO <span>generate</span></div>
+    <div class="theme-toggle">
+      <button class="theme-btn theme-btn-sun" onclick="setTheme('light')" title="Light mode">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><line x1="12" y1="2" x2="12" y2="5"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="4.22" y1="4.22" x2="6.34" y2="6.34"/><line x1="17.66" y1="17.66" x2="19.78" y2="19.78"/><line x1="2" y1="12" x2="5" y2="12"/><line x1="19" y1="12" x2="22" y2="12"/><line x1="4.22" y1="19.78" x2="6.34" y2="17.66"/><line x1="17.66" y1="6.34" x2="19.78" y2="4.22"/></svg>
+      </button>
+      <button class="theme-btn theme-btn-moon" onclick="setTheme('dark')" title="Dark mode">
+        <svg viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      </button>
+    </div>
+  </div>
+  <nav>
+    <button class="active" onclick="switchTab('numbers', this)">Numbers</button>
+    <button onclick="switchTab('strings', this)">Strings</button>
+    <button onclick="switchTab('sequences', this)">Sequences</button>
+    <button onclick="switchTab('lists', this)">Lists</button>
+    <button onclick="switchTab('dice', this)">Dice & Coins</button>
+  </nav>
+</header>
+
+<main>
+  <div class="hero">
+    <h1>CRO</h1>
+    <p>Generate random text strings, numbers, sequences, and other stuff using pure randomness, not the dodgy pseudo-random garbage your computer usually spits out.</p>
+  </div>
+
+  <div class="panels active" id="tab-numbers">
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-title">Integer Generator</div>
+        <div class="panel-desc">Generate one or more random integers in a range</div>
+      </div>
+      <div class="panel-body">
+        <div class="field-row">
+          <div class="field">
+            <label>How many?</label>
+            <input type="number" id="int-count" value="1" min="1" max="10000">
+          </div>
+          <div class="field">
+            <label>Minimum</label>
+            <input type="number" id="int-min" value="1">
+          </div>
+          <div class="field">
+            <label>Maximum</label>
+            <input type="number" id="int-max" value="100">
+          </div>
+          <div class="field">
+            <label>Format</label>
+            <select id="int-format">
+              <option value="decimal">Decimal</option>
+              <option value="hex">Hexadecimal</option>
+              <option value="octal">Octal</option>
+              <option value="binary">Binary</option>
+            </select>
+          </div>
+        </div>
+        <div class="field-row" style="margin-bottom:0.5rem">
+          <div class="field">
+            <label>Sort</label>
+            <select id="int-sort">
+              <option value="none">Unsorted</option>
+              <option value="asc">Ascending</option>
+              <option value="desc">Descending</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Duplicates</label>
+            <select id="int-unique">
+              <option value="no">Allow duplicates</option>
+              <option value="yes">Unique values only</option>
+            </select>
+          </div>
+        </div>
+        <div class="btn-row" style="margin-top:14px">
+          <button class="btn btn-primary" onclick="generateIntegers()">Generate</button>
+          <button class="btn btn-secondary btn-sm" onclick="clearOutput('int-output')">Clear</button>
+        </div>
+        <div class="output-box" id="int-output">
+          <div class="output-topbar">
+            <span class="output-label" id="int-output-label">result</span>
+            <button class="btn btn-secondary btn-sm" onclick="copyOutput('int-result')">Copy</button>
+          </div>
+          <div class="output-content" id="int-result"></div>
+        </div>
+        <div class="stats-row" id="int-stats" style="display:none">
+          <div class="stat-chip">min <span id="int-stat-min"></span></div>
+          <div class="stat-chip">max <span id="int-stat-max"></span></div>
+          <div class="stat-chip">mean <span id="int-stat-mean"></span></div>
+          <div class="stat-chip">median <span id="int-stat-med"></span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-title">Decimal Fractions</div>
+        <div class="panel-desc">Random real numbers between 0 and 1</div>
+      </div>
+      <div class="panel-body">
+        <div class="field-row">
+          <div class="field">
+            <label>How many?</label>
+            <input type="number" id="dec-count" value="5" min="1" max="10000">
+          </div>
+          <div class="field">
+            <label>Decimal places</label>
+            <input type="number" id="dec-places" value="8" min="1" max="20">
+          </div>
+          <div class="field">
+            <label>Sort</label>
+            <select id="dec-sort">
+              <option value="none">Unsorted</option>
+              <option value="asc">Ascending</option>
+              <option value="desc">Descending</option>
+            </select>
+          </div>
+        </div>
+        <div class="btn-row">
+          <button class="btn btn-primary" onclick="generateDecimals()">Generate</button>
+          <button class="btn btn-secondary btn-sm" onclick="clearOutput('dec-output')">Clear</button>
+        </div>
+        <div class="output-box" id="dec-output">
+          <div class="output-topbar">
+            <span class="output-label">result</span>
+            <button class="btn btn-secondary btn-sm" onclick="copyOutput('dec-result')">Copy</button>
+          </div>
+          <div class="output-content" id="dec-result"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-title">Gaussian Distribution</div>
+        <div class="panel-desc">Numbers with a normal distribution</div>
+      </div>
+      <div class="panel-body">
+        <div class="field-row">
+          <div class="field">
+            <label>Count</label>
+            <input type="number" id="gauss-count" value="10" min="1" max="1000">
+          </div>
+          <div class="field">
+            <label>Mean (μ)</label>
+            <input type="number" id="gauss-mean" value="0">
+          </div>
+          <div class="field">
+            <label>Std Dev (σ)</label>
+            <input type="number" id="gauss-sd" value="1" min="0.01" step="0.1">
+          </div>
+          <div class="field">
+            <label>Decimal places</label>
+            <input type="number" id="gauss-dp" value="4" min="1" max="12">
+          </div>
+        </div>
+        <div class="btn-row">
+          <button class="btn btn-primary" onclick="generateGaussian()">Generate</button>
+          <button class="btn btn-secondary btn-sm" onclick="clearOutput('gauss-output')">Clear</button>
+        </div>
+        <div class="output-box" id="gauss-output">
+          <div class="output-topbar">
+            <span class="output-label">result</span>
+            <button class="btn btn-secondary btn-sm" onclick="copyOutput('gauss-result')">Copy</button>
+          </div>
+          <div class="output-content" id="gauss-result"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="panels" id="tab-strings">
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-title">String Generator</div>
+        <div class="panel-desc">Random strings of characters</div>
+      </div>
+      <div class="panel-body">
+        <div class="field-row">
+          <div class="field">
+            <label>How many?</label>
+            <input type="number" id="str-count" value="5" min="1" max="1000">
+          </div>
+          <div class="field">
+            <label>Length (chars)</label>
+            <input type="number" id="str-len" value="12" min="1" max="256">
+          </div>
+        </div>
+        <div class="checkbox-row">
+          <label class="checkbox-item">
+            <input type="checkbox" id="str-upper" checked> Uppercase (A–Z)
+          </label>
+          <label class="checkbox-item">
+            <input type="checkbox" id="str-lower" checked> Lowercase (a–z)
+          </label>
+          <label class="checkbox-item">
+            <input type="checkbox" id="str-digits" checked> Digits (0–9)
+          </label>
+          <label class="checkbox-item">
+            <input type="checkbox" id="str-symbols"> Symbols
+          </label>
+          <label class="checkbox-item">
+            <input type="checkbox" id="str-unique"> Unique only
+          </label>
+        </div>
+        <div class="field" style="margin-bottom:14px">
+          <label>Custom characters (optional, overrides above)</label>
+          <input type="text" id="str-custom" placeholder="e.g. ABCDEF012345">
+        </div>
+        <div class="btn-row">
+          <button class="btn btn-primary" onclick="generateStrings()">Generate</button>
+          <button class="btn btn-secondary btn-sm" onclick="clearOutput('str-output')">Clear</button>
+        </div>
+        <div class="output-box" id="str-output">
+          <div class="output-topbar">
+            <span class="output-label">result</span>
+            <button class="btn btn-secondary btn-sm" onclick="copyOutput('str-result')">Copy</button>
+          </div>
+          <div class="output-content" id="str-result"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-title">UUID Generator</div>
+        <div class="panel-desc">Cryptographically random UUIDs (v4)</div>
+      </div>
+      <div class="panel-body">
+        <div class="field-row">
+          <div class="field">
+            <label>How many?</label>
+            <input type="number" id="uuid-count" value="5" min="1" max="1000">
+          </div>
+          <div class="field">
+            <label>Format</label>
+            <select id="uuid-format">
+              <option value="standard">Standard (xxxxxxxx-xxxx-…)</option>
+              <option value="no-dash">No dashes</option>
+              <option value="upper">Uppercase</option>
+              <option value="braces">With braces {…}</option>
+            </select>
+          </div>
+        </div>
+        <div class="btn-row">
+          <button class="btn btn-primary" onclick="generateUUIDs()">Generate</button>
+          <button class="btn btn-secondary btn-sm" onclick="clearOutput('uuid-output')">Clear</button>
+        </div>
+        <div class="output-box" id="uuid-output">
+          <div class="output-topbar">
+            <span class="output-label">result</span>
+            <button class="btn btn-secondary btn-sm" onclick="copyOutput('uuid-result')">Copy</button>
+          </div>
+          <div class="output-content" id="uuid-result"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="panels" id="tab-sequences">
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-title">Sequence Shuffler</div>
+        <div class="panel-desc">Shuffle a range of integers into a random order</div>
+      </div>
+      <div class="panel-body">
+        <div class="field-row">
+          <div class="field">
+            <label>From</label>
+            <input type="number" id="seq-from" value="1">
+          </div>
+          <div class="field">
+            <label>To</label>
+            <input type="number" id="seq-to" value="20">
+          </div>
+          <div class="field">
+            <label>Per line</label>
+            <select id="seq-cols">
+              <option value="1">1</option>
+              <option value="5" selected>5</option>
+              <option value="10">10</option>
+            </select>
+          </div>
+        </div>
+        <div class="btn-row">
+          <button class="btn btn-primary" onclick="generateSequence()">Shuffle</button>
+          <button class="btn btn-secondary btn-sm" onclick="clearOutput('seq-output')">Clear</button>
+        </div>
+        <div class="output-box" id="seq-output">
+          <div class="output-topbar">
+            <span class="output-label">shuffled sequence</span>
+            <button class="btn btn-secondary btn-sm" onclick="copyOutput('seq-result')">Copy</button>
+          </div>
+          <div class="output-content" id="seq-result"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="panels" id="tab-lists">
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-title">List Randomizer</div>
+        <div class="panel-desc">Shuffle your own list of items</div>
+      </div>
+      <div class="panel-body">
+        <div class="field">
+          <label>Items (one per line)</label>
+          <textarea id="list-input" placeholder="Alice&#10;Bob&#10;Carol&#10;Dave&#10;Eve"></textarea>
+        </div>
+        <div class="field-row" style="margin-top:10px">
+          <div class="field">
+            <label>Pick</label>
+            <select id="list-pick">
+              <option value="all">All items</option>
+              <option value="custom">Custom number</option>
+            </select>
+          </div>
+          <div class="field" id="list-custom-field" style="display:none">
+            <label>How many</label>
+            <input type="number" id="list-custom-n" value="3" min="1">
+          </div>
+        </div>
+        <div class="btn-row" style="margin-top:14px">
+          <button class="btn btn-primary" onclick="randomizeList()">Randomize</button>
+          <button class="btn btn-secondary btn-sm" onclick="clearOutput('list-output')">Clear</button>
+        </div>
+        <div class="output-box" id="list-output">
+          <div class="output-topbar">
+            <span class="output-label">result</span>
+            <button class="btn btn-secondary btn-sm" onclick="copyOutput('list-result')">Copy</button>
+          </div>
+          <div class="output-content" id="list-result"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="panels" id="tab-dice">
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-title">Dice Roller</div>
+        <div class="panel-desc">Roll standard or custom dice</div>
+      </div>
+      <div class="panel-body">
+        <div style="margin-bottom:12px">
+          <label style="display:block; margin-bottom:8px">Die type</label>
+          <div class="dice-grid">
+            <button class="die-btn selected" onclick="selectDie(this, 4)">D4</button>
+            <button class="die-btn" onclick="selectDie(this, 6)">D6</button>
+            <button class="die-btn" onclick="selectDie(this, 8)">D8</button>
+            <button class="die-btn" onclick="selectDie(this, 10)">D10</button>
+            <button class="die-btn" onclick="selectDie(this, 12)">D12</button>
+            <button class="die-btn" onclick="selectDie(this, 20)">D20</button>
+            <button class="die-btn" onclick="selectDie(this, 100)">D100</button>
+          </div>
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label>Number of dice</label>
+            <input type="number" id="dice-count" value="2" min="1" max="100">
+          </div>
+          <div class="field">
+            <label>Custom sides (optional)</label>
+            <input type="number" id="dice-custom" placeholder="e.g. 13">
+          </div>
+        </div>
+        <div class="btn-row">
+          <button class="btn btn-primary" onclick="rollDice()">Roll</button>
+          <button class="btn btn-secondary btn-sm" onclick="clearOutput('dice-output')">Clear</button>
+        </div>
+        <div class="output-box" id="dice-output">
+          <div class="output-topbar">
+            <span class="output-label" id="dice-label">result</span>
+            <button class="btn btn-secondary btn-sm" onclick="copyOutput('dice-result')">Copy</button>
+          </div>
+          <div class="output-content" id="dice-result"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-title">Coin Flipper</div>
+        <div class="panel-desc">Flip one or more fair coins</div>
+      </div>
+      <div class="panel-body">
+        <div class="field-row">
+          <div class="field">
+            <label>Number of flips</label>
+            <input type="number" id="coin-count" value="1" min="1" max="1000">
+          </div>
+        </div>
+        <div class="btn-row">
+          <button class="btn btn-primary" onclick="flipCoins()">Flip</button>
+          <button class="btn btn-secondary btn-sm" onclick="clearOutput('coin-output')">Clear</button>
+        </div>
+        <div class="output-box" id="coin-output">
+          <div class="output-topbar">
+            <span class="output-label">result</span>
+            <button class="btn btn-secondary btn-sm" onclick="copyOutput('coin-result')">Copy</button>
+          </div>
+          <div class="output-content" id="coin-result"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<script>
+function switchTab(id, btn) {
+  document.querySelectorAll('.panels').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + id).classList.add('active');
+  btn.classList.add('active');
+}
+
+function cryptoRandInt(min, max) {
+  const range = max - min + 1;
+  const arr = new Uint32Array(1);
+  let val;
+  do {
+    crypto.getRandomValues(arr);
+    val = arr[0];
+  } while (val >= Math.floor(0xFFFFFFFF / range) * range);
+  return min + (val % range);
+}
+
+function cryptoRandFloat() {
+  const arr = new Uint32Array(1);
+  crypto.getRandomValues(arr);
+  return arr[0] / 0xFFFFFFFF;
+}
+
+function showOutput(id) {
+  document.getElementById(id).classList.add('show');
+}
+
+function clearOutput(id) {
+  document.getElementById(id).classList.remove('show');
+}
+
+async function copyOutput(id) {
+  const text = document.getElementById(id).textContent;
+  await navigator.clipboard.writeText(text);
+}
+
+function generateIntegers() {
+  const count = Math.min(parseInt(document.getElementById('int-count').value) || 1, 10000);
+  const min = parseInt(document.getElementById('int-min').value) || 0;
+  const max = parseInt(document.getElementById('int-max').value) || 100;
+  const fmt = document.getElementById('int-format').value;
+  const sort = document.getElementById('int-sort').value;
+  const unique = document.getElementById('int-unique').value === 'yes';
+
+  if (min > max) { alert('Minimum must be <= Maximum'); return; }
+
+  let nums = [];
+  const pool = unique ? new Set() : null;
+  const actualCount = unique ? Math.min(count, max - min + 1) : count;
+
+  for (let i = 0; i < actualCount * 20 && nums.length < actualCount; i++) {
+    const n = cryptoRandInt(min, max);
+    if (unique) { if (!pool.has(n)) { pool.add(n); nums.push(n); } }
+    else nums.push(n);
+    if (nums.length >= actualCount) break;
+  }
+
+  if (sort === 'asc') nums.sort((a,b) => a - b);
+  else if (sort === 'desc') nums.sort((a,b) => b - a);
+
+  const fmtNum = n => {
+    switch (fmt) {
+      case 'hex': return '0x' + n.toString(16).toUpperCase();
+      case 'octal': return '0o' + n.toString(8);
+      case 'binary': return '0b' + n.toString(2);
+      default: return n.toString();
+    }
+  };
+
+  const display = nums.length === 1
+    ? `<span class="big-num">${fmtNum(nums[0])}</span>`
+    : nums.map(fmtNum).join('\n');
+
+  document.getElementById('int-result').innerHTML = display;
+  document.getElementById('int-output-label').textContent = `${nums.length} integer${nums.length>1?'s':''} generated`;
+  showOutput('int-output');
+
+  if (fmt === 'decimal' && nums.length > 1) {
+    const sorted = [...nums].sort((a,b)=>a-b);
+    const mean = (nums.reduce((a,b)=>a+b,0)/nums.length).toFixed(2);
+    const mid = Math.floor(sorted.length/2);
+    const median = sorted.length%2===0 ? ((sorted[mid-1]+sorted[mid])/2).toFixed(1) : sorted[mid];
+    document.getElementById('int-stat-min').textContent = sorted[0];
+    document.getElementById('int-stat-max').textContent = sorted[sorted.length-1];
+    document.getElementById('int-stat-mean').textContent = mean;
+    document.getElementById('int-stat-med').textContent = median;
+    document.getElementById('int-stats').style.display = 'flex';
+  } else {
+    document.getElementById('int-stats').style.display = 'none';
+  }
+}
+
+function generateDecimals() {
+  const count = Math.min(parseInt(document.getElementById('dec-count').value)||5, 10000);
+  const places = Math.min(parseInt(document.getElementById('dec-places').value)||8, 20);
+  const sort = document.getElementById('dec-sort').value;
+
+  let nums = Array.from({length: count}, () => cryptoRandFloat().toFixed(places));
+  if (sort === 'asc') nums.sort((a,b)=>parseFloat(a)-parseFloat(b));
+  else if (sort === 'desc') nums.sort((a,b)=>parseFloat(b)-parseFloat(a));
+
+  document.getElementById('dec-result').textContent = nums.join('\n');
+  showOutput('dec-output');
+}
+
+function generateGaussian() {
+  const count = Math.min(parseInt(document.getElementById('gauss-count').value)||10, 1000);
+  const mean = parseFloat(document.getElementById('gauss-mean').value)||0;
+  const sd = parseFloat(document.getElementById('gauss-sd').value)||1;
+  const dp = parseInt(document.getElementById('gauss-dp').value)||4;
+
+  const nums = [];
+  for (let i = 0; i < count; i++) {
+    const u1 = cryptoRandFloat(), u2 = cryptoRandFloat();
+    const z = Math.sqrt(-2*Math.log(u1+1e-10)) * Math.cos(2*Math.PI*u2);
+    nums.push((mean + z * sd).toFixed(dp));
+  }
+
+  document.getElementById('gauss-result').textContent = nums.join('\n');
+  showOutput('gauss-output');
+}
+
+function generateStrings() {
+  const count = Math.min(parseInt(document.getElementById('str-count').value)||5, 1000);
+  const len = Math.min(parseInt(document.getElementById('str-len').value)||12, 256);
+  const custom = document.getElementById('str-custom').value.trim();
+  const unique = document.getElementById('str-unique').checked;
+
+  let charset = '';
+  if (custom) {
+    charset = custom;
+  } else {
+    if (document.getElementById('str-upper').checked) charset += 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    if (document.getElementById('str-lower').checked) charset += 'abcdefghijklmnopqrstuvwxyz';
+    if (document.getElementById('str-digits').checked) charset += '0123456789';
+    if (document.getElementById('str-symbols').checked) charset += '!@#$%^&*()-_=+[]{}|;:,.<>?';
+  }
+
+  if (!charset) { alert('Select at least one character set.'); return; }
+
+  const makeStr = () => Array.from({length: len}, () => charset[cryptoRandInt(0, charset.length-1)]).join('');
+
+  let results = [];
+  const seen = new Set();
+  for (let i = 0; i < count * 5 && results.length < count; i++) {
+    const s = makeStr();
+    if (unique) { if (!seen.has(s)) { seen.add(s); results.push(s); } }
+    else results.push(s);
+    if (results.length >= count) break;
+  }
+
+  document.getElementById('str-result').textContent = results.join('\n');
+  showOutput('str-output');
+}
+
+function generateUUIDs() {
+  const count = Math.min(parseInt(document.getElementById('uuid-count').value)||5, 1000);
+  const fmt = document.getElementById('uuid-format').value;
+
+  const makeUUID = () => {
+    const arr = new Uint8Array(16);
+    crypto.getRandomValues(arr);
+    arr[6] = (arr[6] & 0x0f) | 0x40;
+    arr[8] = (arr[8] & 0x3f) | 0x80;
+    const hex = [...arr].map(b => b.toString(16).padStart(2,'0')).join('');
+    return `${hex.slice(0,8)}-${hex.slice(8,12)}-${hex.slice(12,16)}-${hex.slice(16,20)}-${hex.slice(20)}`;
+  };
+
+  let uuids = Array.from({length: count}, makeUUID);
+  uuids = uuids.map(u => {
+    switch(fmt) {
+      case 'no-dash': return u.replace(/-/g,'');
+      case 'upper': return u.toUpperCase();
+      case 'braces': return '{' + u + '}';
+      default: return u;
+    }
+  });
+
+  document.getElementById('uuid-result').textContent = uuids.join('\n');
+  showOutput('uuid-output');
+}
+
+function generateSequence() {
+  const from = parseInt(document.getElementById('seq-from').value)||1;
+  const to = parseInt(document.getElementById('seq-to').value)||20;
+  const cols = parseInt(document.getElementById('seq-cols').value)||5;
+
+  if (from > to) { alert('From must be <= To'); return; }
+  if (to - from > 9999) { alert('Range too large (max 10,000)'); return; }
+
+  const arr = [];
+  for (let i = from; i <= to; i++) arr.push(i);
+
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = cryptoRandInt(0, i);
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+
+  const maxLen = to.toString().length;
+  const rows = [];
+  for (let i = 0; i < arr.length; i += cols) {
+    rows.push(arr.slice(i, i+cols).map(n => n.toString().padStart(maxLen)).join('  '));
+  }
+
+  document.getElementById('seq-result').textContent = rows.join('\n');
+  showOutput('seq-output');
+}
+
+document.getElementById('list-pick').addEventListener('change', function() {
+  document.getElementById('list-custom-field').style.display = this.value === 'custom' ? 'flex' : 'none';
+});
+
+function randomizeList() {
+  const raw = document.getElementById('list-input').value;
+  const items = raw.split('\n').map(s => s.trim()).filter(Boolean);
+  if (!items.length) { alert('Enter at least one item.'); return; }
+
+  for (let i = items.length - 1; i > 0; i--) {
+    const j = cryptoRandInt(0, i);
+    [items[i], items[j]] = [items[j], items[i]];
+  }
+
+  const pickMode = document.getElementById('list-pick').value;
+  let result = items;
+  if (pickMode === 'custom') {
+    const n = Math.min(parseInt(document.getElementById('list-custom-n').value)||1, items.length);
+    result = items.slice(0, n);
+  }
+
+  document.getElementById('list-result').textContent = result.join('\n');
+  showOutput('list-output');
+}
+
+let selectedSides = 4;
+
+function selectDie(btn, sides) {
+  document.querySelectorAll('.die-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  selectedSides = sides;
+}
+
+function rollDice() {
+  const count = Math.min(parseInt(document.getElementById('dice-count').value)||1, 100);
+  const custom = document.getElementById('dice-custom').value.trim();
+  const sides = custom ? (parseInt(custom)||selectedSides) : selectedSides;
+
+  const rolls = Array.from({length: count}, () => cryptoRandInt(1, sides));
+  const total = rolls.reduce((a,b)=>a+b,0);
+
+  document.getElementById('dice-label').textContent = `${count}d${sides}`;
+
+  let display = '';
+  if (count === 1) {
+    display = `<span class="big-num">${rolls[0]}</span>`;
+  } else {
+    display = rolls.join(', ') + `\n\ntotal: ${total}  |  mean: ${(total/count).toFixed(2)}  |  min: ${Math.min(...rolls)}  |  max: ${Math.max(...rolls)}`;
+  }
+
+  document.getElementById('dice-result').innerHTML = display;
+  showOutput('dice-output');
+}
+
+function flipCoins() {
+  const count = Math.min(parseInt(document.getElementById('coin-count').value)||1, 1000);
+  const flips = Array.from({length: count}, () => cryptoRandInt(0,1) ? 'H' : 'T');
+
+  let display;
+  if (count === 1) {
+    display = `<span class="big-num">${flips[0] === 'H' ? 'HEADS' : 'TAILS'}</span>`;
+  } else {
+    const heads = flips.filter(f=>f==='H').length;
+    const tails = count - heads;
+    display = flips.join(' ') + `\n\nheads: ${heads} (${(heads/count*100).toFixed(1)}%)  |  tails: ${tails} (${(tails/count*100).toFixed(1)}%)`;
+  }
+
+  document.getElementById('coin-result').innerHTML = display;
+  showOutput('coin-output');
+}
+
+function setTheme(mode) {
+  if (mode === 'dark') {
+    document.body.classList.add('dark');
+  } else {
+    document.body.classList.remove('dark');
+  }
+  document.querySelector('.theme-btn-sun').classList.toggle('active', mode === 'light');
+  document.querySelector('.theme-btn-moon').classList.toggle('active', mode === 'dark');
+}
+
+setTheme('light');
+</script>
+</body>
+</html>
