@@ -14,3 +14,5 @@ A lightweight, web-based tool built to deliver true randomness directly in your 
 
 ## 📝 License
 Distributed under the MIT License. See `LICENSE` for more information.
+
+(This may or may not be updated, i do not have plans to keep working on this project.)
