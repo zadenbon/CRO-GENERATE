@@ -9,9 +9,7 @@ A lightweight, web-based tool built to deliver true randomness directly in your 
 
 ## 🛠️ Built With
 * HTML5
-* JavaScript (ES6+)
-* CSS3 / Modern Layout Styles
-
+  
 ## 📝 License
 Distributed under the MIT License. See `LICENSE` for more information.
 
