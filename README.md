@@ -13,4 +13,4 @@ A lightweight, web-based tool built to deliver true randomness directly in your 
 * CSS3 / Modern Layout Styles
 
 ## 📝 License
-Distributed under the GPL-3.0 License. See `LICENSE` for more information.
+Distributed under the MIT License. See `LICENSE` for more information.
