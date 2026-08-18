@@ -1,8 +1,8 @@
 # CRO-GENERATE
 
-A lightweight, web based tool built to deliver randomness right into your browser. Whether you need random numbers, strings, or shuffled lists, this application has you covered.
+A lightweight web based tool that uses cryptography to generate random numbers, strings or lists.
 
-## Key Features
+## Features
 * **Randomness**: Uses cryptographic generation logic.
 * **Instant Processing**: Lightweight and purely client sided code execution.
 * **Zero Dependencies**: HTML5 and JavaScript with no heavy frameworks.
